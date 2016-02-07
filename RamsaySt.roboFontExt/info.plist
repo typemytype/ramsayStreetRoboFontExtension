@@ -28,13 +28,13 @@
 	<key>timeStamp</key>
 	<real>1320233007.075783</real>
 	<key>version</key>
-	<string>1.1</string>
+	<string>1.2</string>
 	<key>com.robofontmechanic.Mechanic</key>
 	<dict>
 		<key>repository</key>
 		<string>typemytype/ramsayStreetRoboFontExtension</string>
 		<key>summary</key>
 		<string>Show neighbours.</string>
-	</dict
+	</dict>
 </dict>
 </plist>
