@@ -1,13 +1,12 @@
 from AppKit import NSColor
 
-from robofab.tools.toolsAll import readGlyphConstructions
-
 from mojo.events import addObserver
 from mojo.drawingTools import save, restore, translate
 from mojo.UI import SetCurrentGlyphByName
 
 from lib.tools.drawing import strokePixelPath
 
+from constructions import readGlyphConstructions
 from ramsayStData import RamsayStData
 
 

@@ -1,3 +1,5 @@
+from fontTools.misc.py23 import unichr
+
 import vanilla
 from AppKit import NSSegmentStyleSmallSquare
 
@@ -18,7 +20,7 @@ class AddGlyphNameSheet(object):
 
         self.w.glyphNameText = vanilla.TextBox((10, 17, 100, 22), "Glyph Name:")
         self.w.glyphName = vanilla.EditText((100, 17, -10, 22))
-        
+
         self.w.addButton = vanilla.Button((-70, -30, -10, 20), "Add", callback=self.addCallback, sizeStyle="small")
         self.w.setDefaultButton(self.w.addButton)
 
@@ -115,36 +117,36 @@ class RamsayStSettingsWindowController(BaseWindowController):
 
     def importGlyphNames(self):
         self.showGetFile(["ramsaySt"], self._importGlyphNames)
-    
+
     def _importGlyphNames(self, path):
         if path:
             path = path[0]
             f = open(path, "r")
             lines = f.readlines()
             f.close()
-            
+
             data = dict()
             for line in lines:
                 if line.startswith("#"):
                     continue
                 items = line.split()
                 if len(items) != 3:
-                    continue                
+                    continue
                 glyphName, leftGlyphName, rightGlyphName = items
                 data[glyphName] = leftGlyphName, rightGlyphName
-            
+
             RamsayStData.clear()
             RamsayStData.update(data)
             self.w.dataList.set(RamsayStData.getItems())
             self.updateView()
-                            
+
     def exportGlyphNames(self):
         self.showPutFile(["ramsaySt"], self._exportGlyphNames)
-    
+
     def _exportGlyphNames(self, path):
         if path is None:
             return
-            
+
         output = [
             "# Ramsay St. Glyph List",
             "# <glyphName> <leftGlyphName> <rightGlyphGlyphName>"
@@ -153,11 +155,11 @@ class RamsayStSettingsWindowController(BaseWindowController):
             value = RamsayStData.get(glyphName, None)
             if value is not None:
                 output.append("%s %s %s" % (glyphName, value[0], value[1]))
-                
+
         f = open(path, "w")
         f.write("\n".join(output))
         f.close()
-        
+
     def addDelCallback(self, sender):
         v = sender.get()
         if v == 0:
@@ -172,7 +174,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
         elif v == 3:
             # export
             self.exportGlyphNames()
-            
+
     def okCallback(self, sender):
         RamsayStData.setItems(self.w.dataList)
         RamsayStData.save()
@@ -189,5 +191,6 @@ class RamsayStSettingsWindowController(BaseWindowController):
 
     def updateView(self):
         UpdateCurrentGlyphView()
+
 
 OpenWindow(RamsayStSettingsWindowController)
