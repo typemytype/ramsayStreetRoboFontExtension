@@ -25,7 +25,7 @@ class RamsaySts(object):
         event = info["event"]
         if event.clickCount() == 3:
             x, y = info["point"]
-            font = glyph.getParent()
+            font = glyph.font
             baseName = self.getBaseGlyph(glyph.name)
             left, right = RamsayStData.get(baseName, ("n", "n"))
 
@@ -59,7 +59,7 @@ class RamsaySts(object):
     def _drawNeighborsGlyphs(self, glyph, stroke=True, scale=1):
         if glyph is None:
             return
-        font = glyph.getParent()
+        font = glyph.font
         baseName = self.getBaseGlyph(glyph.name)
         left, right = RamsayStData.get(baseName, ("n", "n"))
 
