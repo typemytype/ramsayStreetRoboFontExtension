@@ -1,13 +1,37 @@
-# Ramsay St.
+Ramsay St.
+==========
 
-Ramsay St. is an extension displaying similar shaped glyphs on the left and right side of the edited glyph.
+A RoboFont extension to display similarly-shaped glyphs to the left & right of the glyph being edited.
 
-Triple click the glyph to edit the glyph.
+![](imgs/RamsaySt_preview.png)
 
-In the Extension menu there is a settings window:
+Once installed, RamsayStreet will become available from the *Extensions* menu.
 
-- change colors
-- change the left and right preview glyph fore each current glyph 
+Use the menu to open the *Settings* window:
+
+![](imgs/RamsaySt_settings.png)
+
+<dl>
+
+<dt>Toggle preview</dt>
+<dd>Use the <em>Show Preview</em> checkbox to turn the glyph previews on/off.</dd>
+
+<dt>Change colors</dt>
+<dd>Use the color swatches to pick the colors for the glyph previews.</dd>
+
+<dt>Define left/right glyphs</dt>
+<dd>
+Double-click the table cells to edit left/right preview glyphs for each glyph.<br/>
+Use the +/- buttons to add/remove glyphs from the list.
+</dd>
+
+<dt>Jump to preview glyph</dt>
+<dd>Triple-click a left/right preview glyph to edit that glyph in the current window.</dd>
+
+<dt>Import/export glyphs list</dt>
+<dd>Use the <em>import/export</em> buttons to import/export the glyphs list to a <code>.ramsaySt</code> file.</dd>
+
+</dl>
 
 ----
 
