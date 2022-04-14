@@ -1,100 +1,108 @@
-from AppKit import NSColor
-
-from mojo.events import addObserver
-from mojo.drawingTools import save, restore, translate
+from mojo.subscriber import Subscriber, registerGlyphEditorSubscriber, registerSubscriberEvent
 from mojo.UI import SetCurrentGlyphByName
 
-from lib.tools.drawing import strokePixelPath
-
-from constructions import readGlyphConstructions
 from ramsayStData import RamsayStData
 
 
-class RamsaySts(object):
+class RamsaySts(Subscriber):
 
-    def __init__(self):
-        self.accentsContstruction = readGlyphConstructions()
-        addObserver(self, "drawNeighbors", "drawBackground")
-        addObserver(self, "drawPreviewNeighBors", "drawPreview")
-        addObserver(self, "mouseDown", "mouseDown")
+    debub = False
 
-    def mouseDown(self, info):
+    def build(self):
+        glyphEditor = self.getGlyphEditor()
+        self.leftGlyph = self.rightGlyph = None
+
+        container = glyphEditor.extensionContainer(RamsayStData.identifier, location="foreground")
+        self.leftGlyphContainer = container.appendPathSublayer(
+            fillColor=RamsayStData.fillColor,
+            strokeColor=RamsayStData.strokeColor,
+            strokeWidth=1
+        )
+        self.rightGlyphContainer = container.appendPathSublayer(
+            fillColor=RamsayStData.fillColor,
+            strokeColor=RamsayStData.strokeColor,
+            strokeWidth=1
+        )
+
+        previewContainer = glyphEditor.extensionContainer(RamsayStData.identifier, location="preview")
+        self.previewLeftGlyphContainer = previewContainer.appendPathSublayer(
+            fillColor=(0, 0, 0, 1)
+        )
+        self.previewRightGlyphContainer = previewContainer.appendPathSublayer(
+            fillColor=(0, 0, 0, 1)
+        )
+
+        self.setGlyph(glyphEditor.getGlyph())
+
+    def setGlyph(self, glyph):
+        leftPath = rightPath = None
+        self.leftGlyph = self.rightGlyph = None
+
+        if glyph is not None:
+            layer = glyph.layer
+            baseName = RamsayStData.getBaseGlyph(glyph.name)
+            leftGlyphName, rightGlyphName = RamsayStData.get(baseName, ("n", "n"))
+
+            if leftGlyphName in layer:
+                self.leftGlyph = layer[leftGlyphName]
+                leftPath = self.leftGlyph.getRepresentation("merz.CGPath")
+                self.leftGlyphContainer.setPosition((-self.leftGlyph.width, 0))
+                if RamsayStData.showPreview:
+                    self.previewLeftGlyphContainer.setPosition((-self.leftGlyph.width, 0))
+
+            if rightGlyphName in layer:
+                self.rightGlyph = layer[rightGlyphName]
+                rightPath = self.rightGlyph.getRepresentation("merz.CGPath")
+                self.rightGlyphContainer.setPosition((glyph.width, 0))
+                if RamsayStData.showPreview:
+                    self.previewRightGlyphContainer.setPosition((glyph.width, 0))
+
+        self.leftGlyphContainer.setPath(leftPath)
+        self.rightGlyphContainer.setPath(rightPath)
+
         if not RamsayStData.showPreview:
-            return
-        glyph = info["glyph"]
-        event = info["event"]
-        if event.clickCount() == 3:
-            x, y = info["point"]
-            font = glyph.font
-            baseName = self.getBaseGlyph(glyph.name)
-            left, right = RamsayStData.get(baseName, ("n", "n"))
+            leftPath = rightPath = None
+        self.previewLeftGlyphContainer.setPath(leftPath)
+        self.previewRightGlyphContainer.setPath(rightPath)
 
-            if left in font:
-                leftGlyph = font[left]
-                path = leftGlyph.naked().getRepresentation("defconAppKit.NSBezierPath")
-                if path.containsPoint_((x + leftGlyph.width, y)):
-                    SetCurrentGlyphByName(left)
-                    return
-            if right in font:
-                rightGlyph = font[right]
-                path = rightGlyph.naked().getRepresentation("defconAppKit.NSBezierPath")
-                if path.containsPoint_((x - glyph.width, y)):
-                    SetCurrentGlyphByName(right)
-                    return
+    def glyphEditorDidSetGlyph(self, info):
+        self.setGlyph(info["glyph"])
 
-    def drawPreviewNeighBors(self, info):
+    def glyphEditorDidMouseDown(self, info):
+        if info["deviceState"]["clickCount"] == 3:
+            x, y = info["locationInGlyph"]
+            glyph = info["glyph"]
+
+            if self.leftGlyph is not None:
+                if self.leftGlyph.pointInside((x + self.leftGlyph.width, y)):
+                    self.getGlyphEditor().setGlyph(self.leftGlyph)
+
+            if self.rightGlyph is not None:
+                if self.rightGlyph.pointInside((x - glyph.width, y)):
+                    print("set ", self.rightGlyph)
+                    self.getGlyphEditor().setGlyph(self.rightGlyph)
+
+    def ramsayStSettingDidChange(self, info):
+        self.leftGlyphContainer.setFillColor(RamsayStData.fillColor)
+        self.leftGlyphContainer.setStrokeColor(RamsayStData.strokeColor)
+
+        self.rightGlyphContainer.setFillColor(RamsayStData.fillColor)
+        self.rightGlyphContainer.setStrokeColor(RamsayStData.strokeColor)
+
         if not RamsayStData.showPreview:
-            return
-        fillColor = NSColor.blackColor()
-        fillColor.set()
-        self._drawNeighborsGlyphs(info["glyph"], stroke=False)
+            self.previewLeftGlyphContainer.setPath(None)
+            self.previewRightGlyphContainer.setPath(None)
 
-    def drawNeighbors(self, info):
-        if not RamsayStData.showPreview:
-            return
-        RamsayStData.fillColor.setFill()
-        RamsayStData.strokeColor.setStroke()
-        self._drawNeighborsGlyphs(info["glyph"], scale=info["scale"])
 
-    def _drawNeighborsGlyphs(self, glyph, stroke=True, scale=1):
-        if glyph is None:
-            return
-        font = glyph.font
-        baseName = self.getBaseGlyph(glyph.name)
-        left, right = RamsayStData.get(baseName, ("n", "n"))
+registerSubscriberEvent(
+    subscriberEventName=RamsayStData.changedEventName,
+    methodName="ramsayStSettingDidChange",
+    lowLevelEventNames=[RamsayStData.changedEventName],
+    dispatcher="roboFont",
+    documentation="Send when RamsaySt setting did change.",
+    delay=0,
+    debug=True
+)
 
-        if left in font:
-            leftGlyph = font[left]
-            save()
-            # translate back the width of the glyph
-            translate(-leftGlyph.width, 0)
-            # performance tricks, the naked attr will return the defcon object
-            # and get the cached bezier path to draw
-            path = leftGlyph.naked().getRepresentation("defconAppKit.NSBezierPath")
-            # fill the path
-            path.fill()
-            if stroke:
-                path.setLineWidth_(scale)
-                strokePixelPath(path)
-            restore()
 
-        # do the same for the other glyph
-        if right in font:
-            rightGlyph = font[right]
-            save()
-            # translate forward the width of the current glyph
-            translate(glyph.width, 0)
-            path = rightGlyph.naked().getRepresentation("defconAppKit.NSBezierPath")
-            path.fill()
-            if stroke:
-                path.setLineWidth_(scale)
-                strokePixelPath(path)
-            restore()
-
-    def getBaseGlyph(self, name):
-        construction = self.accentsContstruction.get(name)
-        if construction is None:
-            return name
-        return construction[0]
-
-RamsaySts()
+registerGlyphEditorSubscriber(RamsaySts)

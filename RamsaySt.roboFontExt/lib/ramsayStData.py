@@ -1,11 +1,7 @@
 from AppKit import NSColor, NSObject
 from mojo.extensions import getExtensionDefault, setExtensionDefault, getExtensionDefaultColor, setExtensionDefaultColor
 
-_baseDefaultKey = "com.typemytype.ramsaySt"
-_fillColorDefaultKey = "%s.fillColor" % _baseDefaultKey
-_strokeColorDefaultKey = "%s.strokeColor" % _baseDefaultKey
-_showPreviewDefaultKey = "%s.showPreview" % _baseDefaultKey
-_dataDefaultKey = "%s.data" % _baseDefaultKey
+from constructions import readGlyphConstructions
 
 
 class RamsayStDataItem(NSObject):
@@ -47,25 +43,33 @@ class RamsayStDataItem(NSObject):
 
 class RamsayStDataCollection(object):
 
-    _fallBackFillColor = NSColor.colorWithCalibratedRed_green_blue_alpha_(.34, .54, .92, .7)
-    _fallBackStrokeColor = NSColor.blackColor()
+    _fallBackFillColor = .34, .54, .92, .7
+    _fallBackStrokeColor = 0, 0, 0, 1
     _fallbackData = {'-': ('n', 'H'), 'A': ('H', 'V'), 'C': ('c', 'G'), 'B': ('P', 'D'), 'E': ('B', 'F'), 'D': ('B', 'P'), 'G': ('C', 'O'), 'F': ('P', 'E'), 'I': ('J', 'H'), 'H': ('I', 'P'), 'K': ('k', 'I'), 'J': ('j', 'I'), 'M': ('H', 'N'), 'L': ('I', 'H'), 'O': ('C', 'o'), 'N': ('M', 'V'), 'Q': ('O', 'G'), 'P': ('R', 'p'), 'S': ('C', 's'), 'R': ('B', 'P'), 'U': ('u', 'H'), 'T': ('I', 'H'), 'W': ('w', 'V'), 'V': ('v', 'W'), 'Y': ('y', 'V'), 'X': ('x', 'Y'), 'Z': ('z', 'X'), 'a': ('n', 'e'), 'c': ('e', 'C'), 'b': ('d', 'p'), 'e': ('o', 'c'), 'd': ('q', 'b'), 'g': ('o', 'q'), 'f': ('i', 't'), 'i': ('period', 'j'), 'h': ('l', 'n'), 'k': ('h', 'K'), 'j': ('i', 'period'), 'm': ('n', 'w'), 'l': ('h', 'k'), 'o': ('c', 'O'), 'n': ('h', 'm'), 'q': ('d', 'p'), 'p': ('q', 'P'), 's': ('e', 'S'), 'r': ('s', 'n'), 'u': ('v', 'n'), 't': ('s', 'f'), 'w': ('v', 'W'), 'v': ('u', 'w'), 'y': ('v', 'Y'), 'x': ('y', 'X'), 'z': ('x', 'Z')}
     _fallbackShowPreview = True
+
+    identifier = "com.typemytype.ramsaySt"
+    fillColorDefaultKey = f"{identifier}.fillColor"
+    strokeColorDefaultKey = f"{identifier}.strokeColor"
+    showPreviewDefaultKey = f"{identifier}.showPreview"
+    dataDefaultKey = f"{identifier}.data"
+
+    changedEventName = f"{identifier}.settingChanged"
 
     def __init__(self):
         self.load()
 
     def load(self):
-        self.fillColor = getExtensionDefaultColor(_fillColorDefaultKey, self._fallBackFillColor)
-        self.strokeColor = getExtensionDefaultColor(_strokeColorDefaultKey, self._fallBackStrokeColor)
-        self.showPreview = getExtensionDefault(_showPreviewDefaultKey, self._fallbackShowPreview)
-        self.data = getExtensionDefault(_dataDefaultKey, self._fallbackData)
+        self.fillColor = getExtensionDefault(self.fillColorDefaultKey, self._fallBackFillColor)
+        self.strokeColor = getExtensionDefault(self.strokeColorDefaultKey, self._fallBackStrokeColor)
+        self.showPreview = getExtensionDefault(self.showPreviewDefaultKey, self._fallbackShowPreview)
+        self.data = getExtensionDefault(self.dataDefaultKey, self._fallbackData)
 
     def save(self):
-        setExtensionDefaultColor(_fillColorDefaultKey, self.fillColor)
-        setExtensionDefaultColor(_strokeColorDefaultKey, self.strokeColor)
-        setExtensionDefault(_showPreviewDefaultKey, self.showPreview)
-        setExtensionDefault(_dataDefaultKey, self.data)
+        setExtensionDefault(self.fillColorDefaultKey, self.fillColor)
+        setExtensionDefault(self.strokeColorDefaultKey, self.strokeColor)
+        setExtensionDefault(self.showPreviewDefaultKey, self.showPreview)
+        setExtensionDefault(self.dataDefaultKey, self.data)
 
     def keys(self):
         return self.data.keys()
@@ -101,5 +105,14 @@ class RamsayStDataCollection(object):
 
     def newItem(self, glyphName):
         return RamsayStDataItem(glyphName, (" ", " "))
+
+    accentsContstruction = readGlyphConstructions()
+
+    def getBaseGlyph(self, name):
+        construction = self.accentsContstruction.get(name)
+        if construction is None:
+            return name
+        return construction[0]
+
 
 RamsayStData = RamsayStDataCollection()

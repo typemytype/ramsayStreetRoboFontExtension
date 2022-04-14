@@ -1,5 +1,3 @@
-from fontTools.misc.py23 import unichr
-
 import vanilla
 from AppKit import NSSegmentStyleSmallSquare
 
@@ -7,6 +5,8 @@ from defconAppKit.windows.baseWindow import BaseWindowController
 
 from mojo.roboFont import OpenWindow
 from mojo.UI import UpdateCurrentGlyphView
+from mojo.extensions import NSColorToRgba, rgbaToNSColor
+from mojo.events import postEvent
 
 from ramsayStData import RamsayStData
 
@@ -26,7 +26,7 @@ class AddGlyphNameSheet(object):
 
         self.w.closeButton = vanilla.Button((-150, -30, -80, 20), "Cancel", callback=self.closeCallback, sizeStyle="small")
         self.w.closeButton.bind(".", ["command"])
-        self.w.closeButton.bind(unichr(27), [])
+        self.w.closeButton.bind(chr(27), [])
 
         self.w.open()
 
@@ -50,20 +50,19 @@ class RamsayStSettingsWindowController(BaseWindowController):
         self.w.showPreview = vanilla.CheckBox((10, 10, -10, 22), "Show Preview", value=RamsayStData.showPreview, callback=self.showPreviewCallback)
 
         self.w.fillColorText = vanilla.TextBox((10, 40, 110, 22), "Fill Color:")
-        self.w.fillColor = vanilla.ColorWell((10, 60, 110, 40), color=RamsayStData.fillColor, callback=self.fillColorCallback)
+        self.w.fillColor = vanilla.ColorWell((10, 60, 110, 40), color=rgbaToNSColor(RamsayStData.fillColor), callback=self.fillColorCallback)
 
         self.w.strokeColorText = vanilla.TextBox((130, 40, -10, 22), "Stroke Color:")
-        self.w.strokeColor = vanilla.ColorWell((130, 60, -10, 40), color=RamsayStData.strokeColor, callback=self.strokeColorCallback)
+        self.w.strokeColor = vanilla.ColorWell((130, 60, -10, 40), color=rgbaToNSColor(RamsayStData.strokeColor), callback=self.strokeColorCallback)
 
         items = RamsayStData.getItems()
         columnDescriptions = [
-                              dict(title="Glyph Name", key="glyphName"),
-                              dict(title="Left", key="left"),
-                              dict(title="Right", key="right"),
-                              ]
+            dict(title="Glyph Name", key="glyphName"),
+            dict(title="Left", key="left"),
+            dict(title="Right", key="right"),
+        ]
 
         self.w.dataList = vanilla.List((10, 110, -10, -40), items, columnDescriptions=columnDescriptions, editCallback=self.dataListEditCallback)
-
 
         segmentDescriptions = [dict(title="+"), dict(title="-"), dict(title="import"), dict(title="export")]
         self.w.addDel = vanilla.SegmentedButton((12, -32, -140, 20), segmentDescriptions, selectionStyle="momentary", callback=self.addDelCallback)
@@ -75,24 +74,24 @@ class RamsayStSettingsWindowController(BaseWindowController):
 
         self.w.closeButton = vanilla.Button((-140, -30, -80, 20), "Cancel", callback=self.closeCallback, sizeStyle="small")
         self.w.closeButton.bind(".", ["command"])
-        self.w.closeButton.bind(unichr(27), [])
+        self.w.closeButton.bind(chr(27), [])
 
         self.w.open()
 
     def showPreviewCallback(self, sender):
         RamsayStData.showPreview = sender.get()
         RamsayStData.save()
-        self.updateView()
+        self.update()
 
     def fillColorCallback(self, sender):
-        RamsayStData.fillColor = sender.get()
+        RamsayStData.fillColor = NSColorToRgba(sender.get())
         RamsayStData.save()
-        self.updateView()
+        self.update()
 
     def strokeColorCallback(self, sender):
-        RamsayStData.strokeColor = sender.get()
+        RamsayStData.strokeColor = NSColorToRgba(sender.get())
         RamsayStData.save()
-        self.updateView()
+        self.update()
 
     def _addGlyphName(self, sender):
         glyphName = sender.get()
@@ -138,7 +137,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
             RamsayStData.clear()
             RamsayStData.update(data)
             self.w.dataList.set(RamsayStData.getItems())
-            self.updateView()
+            self.update()
 
     def exportGlyphNames(self):
         self.showPutFile(["ramsaySt"], self._exportGlyphNames)
@@ -149,8 +148,8 @@ class RamsayStSettingsWindowController(BaseWindowController):
 
         output = [
             "# Ramsay St. Glyph List",
-            "# <glyphName> <leftGlyphName> <rightGlyphGlyphName>"
-            ]
+            "# <glyphName> <leftGlyphName> <rightGlyphName>"
+        ]
         for glyphName in sorted(RamsayStData.keys()):
             value = RamsayStData.get(glyphName, None)
             if value is not None:
@@ -178,7 +177,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
     def okCallback(self, sender):
         RamsayStData.setItems(self.w.dataList)
         RamsayStData.save()
-        self.updateView()
+        self.update()
 
     def closeCallback(self, sender):
         self.w.close()
@@ -189,8 +188,8 @@ class RamsayStSettingsWindowController(BaseWindowController):
             item = sender[i]
             RamsayStData.set(item)
 
-    def updateView(self):
-        UpdateCurrentGlyphView()
+    def update(self):
+        postEvent(RamsayStData.changedEventName)
 
 
 OpenWindow(RamsayStSettingsWindowController)
