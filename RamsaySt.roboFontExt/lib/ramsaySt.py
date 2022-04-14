@@ -92,6 +92,9 @@ class RamsaySts(Subscriber):
         if not RamsayStData.showPreview:
             self.previewLeftGlyphContainer.setPath(None)
             self.previewRightGlyphContainer.setPath(None)
+        else:
+            self.previewLeftGlyphContainer.setPath(self.leftGlyphContainer.getPath())
+            self.previewRightGlyphContainer.setPath(self.rightGlyphContainer.getPath())
 
 
 registerSubscriberEvent(
