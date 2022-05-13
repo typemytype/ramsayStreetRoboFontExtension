@@ -47,7 +47,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
     def __init__(self):
         self.w = vanilla.FloatingWindow((310, 300), "Ramsay St. Settings", minSize=(310, 250), maxSize=(310, 700))
 
-        self.w.showPreview = vanilla.CheckBox((10, 10, -10, 22), "Show Preview", value=RamsayStData.showPreview, callback=self.showPreviewCallback)
+        self.w.showPreview = vanilla.CheckBox((10, 10, -10, 22), "Show In Preview Mode", value=RamsayStData.showPreview, callback=self.showPreviewCallback)
 
         self.w.fillColorText = vanilla.TextBox((10, 40, 110, 22), "Fill Color:")
         self.w.fillColor = vanilla.ColorWell((10, 60, 110, 40), color=rgbaToNSColor(RamsayStData.fillColor), callback=self.fillColorCallback)
