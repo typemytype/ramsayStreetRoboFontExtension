@@ -47,15 +47,13 @@ class RamsaySts(Subscriber):
                 self.leftGlyph = layer[leftGlyphName]
                 leftPath = self.leftGlyph.getRepresentation("merz.CGPath")
                 self.leftGlyphContainer.setPosition((-self.leftGlyph.width, 0))
-                if RamsayStData.showPreview:
-                    self.previewLeftGlyphContainer.setPosition((-self.leftGlyph.width, 0))
+                self.previewLeftGlyphContainer.setPosition((-self.leftGlyph.width, 0))
 
             if rightGlyphName in layer:
                 self.rightGlyph = layer[rightGlyphName]
                 rightPath = self.rightGlyph.getRepresentation("merz.CGPath")
                 self.rightGlyphContainer.setPosition((glyph.width, 0))
-                if RamsayStData.showPreview:
-                    self.previewRightGlyphContainer.setPosition((glyph.width, 0))
+                self.previewRightGlyphContainer.setPosition((glyph.width, 0))
 
         self.leftGlyphContainer.setPath(leftPath)
         self.rightGlyphContainer.setPath(rightPath)
