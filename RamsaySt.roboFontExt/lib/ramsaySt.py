@@ -82,7 +82,6 @@ class RamsaySts(Subscriber):
 
             if self.rightGlyph is not None:
                 if self.rightGlyph.pointInside((x - glyph.width, y)):
-                    print("set ", self.rightGlyph)
                     self.getGlyphEditor().setGlyph(self.rightGlyph)
 
     def ramsayStSettingDidChange(self, info):
