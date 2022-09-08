@@ -66,6 +66,11 @@ class RamsaySts(Subscriber):
     def glyphEditorDidSetGlyph(self, info):
         self.setGlyph(info["glyph"])
 
+    def glyphEditorGlyphDidChangeMetrics(self, info):
+        glyph = info["glyph"]
+        self.rightGlyphContainer.setPosition((glyph.width, 0))
+        self.previewRightGlyphContainer.setPosition((glyph.width, 0))
+
     def glyphEditorDidMouseDown(self, info):
         if info["deviceState"]["clickCount"] == 3:
             x, y = info["locationInGlyph"]
