@@ -16,20 +16,24 @@ class RamsaySts(Subscriber):
         self.leftGlyphContainer = container.appendPathSublayer(
             fillColor=RamsayStData.fillColor,
             strokeColor=RamsayStData.strokeColor,
-            strokeWidth=1
+            strokeWidth=1,
+            visible=False
         )
         self.rightGlyphContainer = container.appendPathSublayer(
             fillColor=RamsayStData.fillColor,
             strokeColor=RamsayStData.strokeColor,
-            strokeWidth=1
+            strokeWidth=1,
+            visible=False
         )
 
         previewContainer = glyphEditor.extensionContainer(RamsayStData.identifier, location="preview")
         self.previewLeftGlyphContainer = previewContainer.appendPathSublayer(
-            fillColor=(0, 0, 0, 1)
+            fillColor=(0, 0, 0, 1),
+            visible=False
         )
         self.previewRightGlyphContainer = previewContainer.appendPathSublayer(
-            fillColor=(0, 0, 0, 1)
+            fillColor=(0, 0, 0, 1),
+            visible=False
         )
 
         self.setGlyph(glyphEditor.getGlyph())
@@ -57,11 +61,13 @@ class RamsaySts(Subscriber):
 
         self.leftGlyphContainer.setPath(leftPath)
         self.rightGlyphContainer.setPath(rightPath)
+        self.leftGlyphContainer.setVisible(RamsayStData.showNeighbours)
+        self.rightGlyphContainer.setVisible(RamsayStData.showNeighbours)
 
-        if not RamsayStData.showPreview:
-            leftPath = rightPath = None
         self.previewLeftGlyphContainer.setPath(leftPath)
         self.previewRightGlyphContainer.setPath(rightPath)
+        self.previewLeftGlyphContainer.setVisible(RamsayStData.showPreview)
+        self.previewRightGlyphContainer.setVisible(RamsayStData.showPreview)
 
     def glyphEditorDidSetGlyph(self, info):
         self.setGlyph(info["glyph"])
@@ -87,16 +93,15 @@ class RamsaySts(Subscriber):
     def ramsayStSettingDidChange(self, info):
         self.leftGlyphContainer.setFillColor(RamsayStData.fillColor)
         self.leftGlyphContainer.setStrokeColor(RamsayStData.strokeColor)
-
+        self.leftGlyphContainer.setVisible(RamsayStData.showNeighbours)
         self.rightGlyphContainer.setFillColor(RamsayStData.fillColor)
         self.rightGlyphContainer.setStrokeColor(RamsayStData.strokeColor)
+        self.rightGlyphContainer.setVisible(RamsayStData.showNeighbours)
 
-        if not RamsayStData.showPreview:
-            self.previewLeftGlyphContainer.setPath(None)
-            self.previewRightGlyphContainer.setPath(None)
-        else:
-            self.previewLeftGlyphContainer.setPath(self.leftGlyphContainer.getPath())
-            self.previewRightGlyphContainer.setPath(self.rightGlyphContainer.getPath())
+        self.previewLeftGlyphContainer.setPath(self.leftGlyphContainer.getPath())
+        self.previewLeftGlyphContainer.setVisible(RamsayStData.showPreview)
+        self.previewRightGlyphContainer.setPath(self.rightGlyphContainer.getPath())
+        self.previewRightGlyphContainer.setVisible(RamsayStData.showPreview)
 
 
 registerSubscriberEvent(

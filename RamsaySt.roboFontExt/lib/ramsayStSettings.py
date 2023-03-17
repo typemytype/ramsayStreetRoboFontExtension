@@ -47,13 +47,14 @@ class RamsayStSettingsWindowController(BaseWindowController):
     def __init__(self):
         self.w = vanilla.FloatingWindow((310, 300), "Ramsay St. Settings", minSize=(310, 250), maxSize=(310, 700))
 
-        self.w.showPreview = vanilla.CheckBox((10, 10, -10, 22), "Show In Preview Mode", value=RamsayStData.showPreview, callback=self.showPreviewCallback)
+        self.w.showNeighbours = vanilla.CheckBox((10, 10, -10, 22), "Show Neighbours", value=RamsayStData.showNeighbours, callback=self.showNeighboursCallback)
+        self.w.showPreview = vanilla.CheckBox((10, 40, -10, 22), "Show In Preview Mode", value=RamsayStData.showPreview, callback=self.showPreviewCallback)
+        
+        self.w.fillColorText = vanilla.TextBox((10, 70, 110, 22), "Fill Color:")
+        self.w.fillColor = vanilla.ColorWell((10, 90, 110, 40), color=rgbaToNSColor(RamsayStData.fillColor), callback=self.fillColorCallback)
 
-        self.w.fillColorText = vanilla.TextBox((10, 40, 110, 22), "Fill Color:")
-        self.w.fillColor = vanilla.ColorWell((10, 60, 110, 40), color=rgbaToNSColor(RamsayStData.fillColor), callback=self.fillColorCallback)
-
-        self.w.strokeColorText = vanilla.TextBox((130, 40, -10, 22), "Stroke Color:")
-        self.w.strokeColor = vanilla.ColorWell((130, 60, -10, 40), color=rgbaToNSColor(RamsayStData.strokeColor), callback=self.strokeColorCallback)
+        self.w.strokeColorText = vanilla.TextBox((130, 70, -10, 22), "Stroke Color:")
+        self.w.strokeColor = vanilla.ColorWell((130, 90, -10, 40), color=rgbaToNSColor(RamsayStData.strokeColor), callback=self.strokeColorCallback)
 
         items = RamsayStData.getItems()
         columnDescriptions = [
@@ -62,7 +63,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
             dict(title="Right", key="right"),
         ]
 
-        self.w.dataList = vanilla.List((10, 110, -10, -40), items, columnDescriptions=columnDescriptions, editCallback=self.dataListEditCallback)
+        self.w.dataList = vanilla.List((10, 140, -10, -40), items, columnDescriptions=columnDescriptions, editCallback=self.dataListEditCallback)
 
         segmentDescriptions = [dict(title="+"), dict(title="-"), dict(title="import"), dict(title="export")]
         self.w.addDel = vanilla.SegmentedButton((12, -32, -140, 20), segmentDescriptions, selectionStyle="momentary", callback=self.addDelCallback)
@@ -77,6 +78,11 @@ class RamsayStSettingsWindowController(BaseWindowController):
         self.w.closeButton.bind(chr(27), [])
 
         self.w.open()
+
+    def showNeighboursCallback(self, sender):
+        RamsayStData.showNeighbours = sender.get()
+        RamsayStData.save()
+        self.update()
 
     def showPreviewCallback(self, sender):
         RamsayStData.showPreview = sender.get()
