@@ -1,5 +1,5 @@
 from mojo.subscriber import Subscriber, registerGlyphEditorSubscriber, registerSubscriberEvent
-from mojo.UI import SetCurrentGlyphByName
+from mojo.UI import appearanceColorKey, getDefault
 
 from ramsayStData import RamsayStData
 
@@ -10,6 +10,8 @@ class RamsaySts(Subscriber):
 
     def build(self):
         glyphEditor = self.getGlyphEditor()
+        previewFillColor = getDefault(
+            appearanceColorKey("glyphViewPreviewFillColor"))
         self.leftGlyph = self.rightGlyph = None
 
         container = glyphEditor.extensionContainer(RamsayStData.identifier, location="foreground")
@@ -28,11 +30,11 @@ class RamsaySts(Subscriber):
 
         previewContainer = glyphEditor.extensionContainer(RamsayStData.identifier, location="preview")
         self.previewLeftGlyphContainer = previewContainer.appendPathSublayer(
-            fillColor=(0, 0, 0, 1),
+            fillColor=previewFillColor,
             visible=False
         )
         self.previewRightGlyphContainer = previewContainer.appendPathSublayer(
-            fillColor=(0, 0, 0, 1),
+            fillColor=previewFillColor,
             visible=False
         )
 
