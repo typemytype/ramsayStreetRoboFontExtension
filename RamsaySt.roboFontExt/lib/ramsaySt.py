@@ -6,7 +6,7 @@ from ramsayStData import RamsayStData
 
 class RamsaySts(Subscriber):
 
-    debub = False
+    debug = False
 
     def build(self):
         glyphEditor = self.getGlyphEditor()
