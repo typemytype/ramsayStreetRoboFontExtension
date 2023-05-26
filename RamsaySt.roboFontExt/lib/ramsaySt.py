@@ -10,8 +10,9 @@ class RamsaySts(Subscriber):
 
     def build(self):
         glyphEditor = self.getGlyphEditor()
-        previewFillColor = getDefault(
+        self.previewFillColor = getDefault(
             appearanceColorKey("glyphViewPreviewFillColor"))
+        self.previewKey = getDefault("glyphViewQuickPreviewKey")
         self.leftGlyph = self.rightGlyph = None
 
         container = glyphEditor.extensionContainer(RamsayStData.identifier, location="foreground")
@@ -30,11 +31,11 @@ class RamsaySts(Subscriber):
 
         previewContainer = glyphEditor.extensionContainer(RamsayStData.identifier, location="preview")
         self.previewLeftGlyphContainer = previewContainer.appendPathSublayer(
-            fillColor=previewFillColor,
+            fillColor=self.previewFillColor,
             visible=False
         )
         self.previewRightGlyphContainer = previewContainer.appendPathSublayer(
-            fillColor=previewFillColor,
+            fillColor=self.previewFillColor,
             visible=False
         )
 
@@ -80,6 +81,9 @@ class RamsaySts(Subscriber):
         self.previewRightGlyphContainer.setPosition((glyph.width, 0))
 
     def glyphEditorDidMouseDown(self, info):
+        '''
+        triple-click any neighbor glyph to jump directly to it
+        '''
         if info["deviceState"]["clickCount"] == 3:
             x, y = info["locationInGlyph"]
             glyph = info["glyph"]
@@ -91,6 +95,14 @@ class RamsaySts(Subscriber):
             if self.rightGlyph is not None:
                 if self.rightGlyph.pointInside((x - glyph.width, y)):
                     self.getGlyphEditor().setGlyph(self.rightGlyph)
+
+    def glyphEditorDidKeyDown(self, info):
+        '''
+        refresh neighbors when the preview key is hit
+        (to avoid looking at outdated neighbors)
+        '''
+        if info['deviceState']['keyDownWithoutModifiers'] == self.previewKey:
+            self.setGlyph(info["glyph"])
 
     def ramsayStSettingDidChange(self, info):
         self.leftGlyphContainer.setFillColor(RamsayStData.fillColor)
