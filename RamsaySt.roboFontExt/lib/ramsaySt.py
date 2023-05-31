@@ -74,6 +74,7 @@ class RamsaySts(Subscriber):
 
     def glyphEditorDidSetGlyph(self, info):
         self.setGlyph(info["glyph"])
+        self.setAdjunctObjectsToObserve([self.leftGlyph, self.rightGlyph])
 
     def glyphEditorGlyphDidChangeMetrics(self, info):
         glyph = info["glyph"]
@@ -96,13 +97,8 @@ class RamsaySts(Subscriber):
                 if self.rightGlyph.pointInside((x - glyph.width, y)):
                     self.getGlyphEditor().setGlyph(self.rightGlyph)
 
-    def glyphEditorDidKeyDown(self, info):
-        '''
-        refresh neighbors when the preview key is hit
-        (to avoid looking at outdated neighbors)
-        '''
-        if info['deviceState']['keyDownWithoutModifiers'] == self.previewKey:
-            self.setGlyph(info["glyph"])
+    def adjunctGlyphDidChange(self, info):
+        self.setGlyph(info["glyph"])
 
     def roboFontAppearanceChanged(self, info):
         rgba = getDefault(
