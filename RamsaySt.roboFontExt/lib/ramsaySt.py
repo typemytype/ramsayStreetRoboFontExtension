@@ -10,7 +10,7 @@ class RamsaySts(Subscriber):
 
     def build(self):
         glyphEditor = self.getGlyphEditor()
-        self.previewFillColor = getDefault(
+        previewFillColor = getDefault(
             appearanceColorKey("glyphViewPreviewFillColor"))
         self.previewKey = getDefault("glyphViewQuickPreviewKey")
         self.leftGlyph = self.rightGlyph = None
@@ -31,11 +31,11 @@ class RamsaySts(Subscriber):
 
         previewContainer = glyphEditor.extensionContainer(RamsayStData.identifier, location="preview")
         self.previewLeftGlyphContainer = previewContainer.appendPathSublayer(
-            fillColor=self.previewFillColor,
+            fillColor=previewFillColor,
             visible=False
         )
         self.previewRightGlyphContainer = previewContainer.appendPathSublayer(
-            fillColor=self.previewFillColor,
+            fillColor=previewFillColor,
             visible=False
         )
 
@@ -103,6 +103,12 @@ class RamsaySts(Subscriber):
         '''
         if info['deviceState']['keyDownWithoutModifiers'] == self.previewKey:
             self.setGlyph(info["glyph"])
+
+    def roboFontAppearanceChanged(self, info):
+        rgba = getDefault(
+            appearanceColorKey("glyphViewPreviewFillColor"))
+        self.previewLeftGlyphContainer.setFillColor(rgba)
+        self.previewRightGlyphContainer.setFillColor(rgba)
 
     def ramsayStSettingDidChange(self, info):
         self.leftGlyphContainer.setFillColor(RamsayStData.fillColor)
