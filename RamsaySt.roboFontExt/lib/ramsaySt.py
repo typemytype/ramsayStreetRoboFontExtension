@@ -12,7 +12,6 @@ class RamsaySts(Subscriber):
         glyphEditor = self.getGlyphEditor()
         previewFillColor = getDefault(
             appearanceColorKey("glyphViewPreviewFillColor"))
-        self.previewKey = getDefault("glyphViewQuickPreviewKey")
         self.leftGlyph = self.rightGlyph = None
 
         container = glyphEditor.extensionContainer(RamsayStData.identifier, location="foreground")
@@ -62,6 +61,8 @@ class RamsaySts(Subscriber):
                 self.rightGlyphContainer.setPosition((glyph.width, 0))
                 self.previewRightGlyphContainer.setPosition((glyph.width, 0))
 
+        self.setAdjunctObjectsToObserve([self.leftGlyph, self.rightGlyph])
+
         self.leftGlyphContainer.setPath(leftPath)
         self.rightGlyphContainer.setPath(rightPath)
         self.leftGlyphContainer.setVisible(RamsayStData.showNeighbours)
@@ -74,7 +75,6 @@ class RamsaySts(Subscriber):
 
     def glyphEditorDidSetGlyph(self, info):
         self.setGlyph(info["glyph"])
-        self.setAdjunctObjectsToObserve([self.leftGlyph, self.rightGlyph])
 
     def glyphEditorGlyphDidChangeMetrics(self, info):
         glyph = info["glyph"]
@@ -98,7 +98,8 @@ class RamsaySts(Subscriber):
                     self.getGlyphEditor().setGlyph(self.rightGlyph)
 
     def adjunctGlyphDidChange(self, info):
-        self.setGlyph(info["glyph"])
+        centerGlyph = self.getGlyphEditor().getGlyph()
+        self.setGlyph(centerGlyph)
 
     def roboFontAppearanceChanged(self, info):
         rgba = getDefault(
