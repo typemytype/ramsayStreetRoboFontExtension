@@ -61,6 +61,8 @@ class RamsaySts(Subscriber):
                 self.rightGlyphContainer.setPosition((glyph.width, 0))
                 self.previewRightGlyphContainer.setPosition((glyph.width, 0))
 
+        self.setAdjunctObjectsToObserve([self.leftGlyph, self.rightGlyph])
+
         self.leftGlyphContainer.setPath(leftPath)
         self.rightGlyphContainer.setPath(rightPath)
         self.leftGlyphContainer.setVisible(RamsayStData.showNeighbours)
@@ -80,6 +82,9 @@ class RamsaySts(Subscriber):
         self.previewRightGlyphContainer.setPosition((glyph.width, 0))
 
     def glyphEditorDidMouseDown(self, info):
+        '''
+        triple-click any neighbor glyph to jump directly to it
+        '''
         if info["deviceState"]["clickCount"] == 3:
             x, y = info["locationInGlyph"]
             glyph = info["glyph"]
@@ -91,6 +96,16 @@ class RamsaySts(Subscriber):
             if self.rightGlyph is not None:
                 if self.rightGlyph.pointInside((x - glyph.width, y)):
                     self.getGlyphEditor().setGlyph(self.rightGlyph)
+
+    def adjunctGlyphDidChange(self, info):
+        centerGlyph = self.getGlyphEditor().getGlyph()
+        self.setGlyph(centerGlyph)
+
+    def roboFontAppearanceChanged(self, info):
+        rgba = getDefault(
+            appearanceColorKey("glyphViewPreviewFillColor"))
+        self.previewLeftGlyphContainer.setFillColor(rgba)
+        self.previewRightGlyphContainer.setFillColor(rgba)
 
     def ramsayStSettingDidChange(self, info):
         self.leftGlyphContainer.setFillColor(RamsayStData.fillColor)
