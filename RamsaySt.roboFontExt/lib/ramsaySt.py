@@ -61,7 +61,13 @@ class RamsaySts(Subscriber):
                 self.rightGlyphContainer.setPosition((glyph.width, 0))
                 self.previewRightGlyphContainer.setPosition((glyph.width, 0))
 
-        self.setAdjunctObjectsToObserve([self.leftGlyph, self.rightGlyph])
+        adjunctGlyphs = []
+        if self.leftGlyph:
+            adjunctGlyphs.append(self.leftGlyph)
+        if self.rightGlyph:
+            adjunctGlyphs.append(self.rightGlyph)
+
+        self.setAdjunctObjectsToObserve(adjunctGlyphs)
 
         self.leftGlyphContainer.setPath(leftPath)
         self.rightGlyphContainer.setPath(rightPath)
