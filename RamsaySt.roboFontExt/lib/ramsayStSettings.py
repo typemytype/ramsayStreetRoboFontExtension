@@ -137,7 +137,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
                 items = line.split()
                 if len(items) != 3:
                     continue
-                leftGlyphName, glyphName, rightGlyphName = items
+                glyphName, leftGlyphName, rightGlyphName = items
                 data[glyphName] = leftGlyphName, rightGlyphName
 
             RamsayStData.clear()
