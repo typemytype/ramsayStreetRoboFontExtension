@@ -1,0 +1,13 @@
+name: Ramsay St
+developer: TypeMyType
+developerURL: http://www.typemytype.com
+launchAtStartUp: true
+mainScript: ramsaySt.py
+version: '2.6'
+addToMenu:
+- path: ramsayStSettings.py
+  preferredName: Ramsay St. Settings
+  shortKey: ''
+html: true
+requiresVersionMajor: '4'
+requiresVersionMinor: 4b
