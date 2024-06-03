@@ -46,8 +46,14 @@ class RamsaySts(Subscriber):
 
         if glyph is not None:
             layer = glyph.layer
-            baseName = RamsayStData.getBaseGlyph(glyph.name)
-            leftGlyphName, rightGlyphName = RamsayStData.get(baseName, ("n", "n"))
+            if glyph.name in RamsayStData:
+                # (composed) glyph + neighbors specified in RamsaySt settings
+                leftGlyphName, rightGlyphName = RamsayStData.get(glyph.name)
+            else:
+                # fall back to base glyph (e.g. a for aacute), and show
+                # neighbors for it (if assigned), or default neighbors n, n
+                baseName = RamsayStData.getBaseGlyph(glyph.name)
+                leftGlyphName, rightGlyphName = RamsayStData.get(baseName, ("n", "n"))
 
             if leftGlyphName in layer:
                 self.leftGlyph = layer[leftGlyphName]
