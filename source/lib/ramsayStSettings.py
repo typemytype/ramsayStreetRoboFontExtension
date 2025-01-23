@@ -49,7 +49,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
 
         self.w.showNeighbours = vanilla.CheckBox((10, 10, -10, 22), "Show Neighbours", value=RamsayStData.showNeighbours, callback=self.showNeighboursCallback)
         self.w.showPreview = vanilla.CheckBox((10, 40, -10, 22), "Show In Preview Mode", value=RamsayStData.showPreview, callback=self.showPreviewCallback)
-        
+
         self.w.fillColorText = vanilla.TextBox((10, 70, 110, 22), "Fill Color:")
         self.w.fillColor = vanilla.ColorWell((10, 90, 110, 40), color=rgbaToNSColor(RamsayStData.fillColor), callback=self.fillColorCallback)
 
@@ -117,8 +117,10 @@ class RamsayStSettingsWindowController(BaseWindowController):
     def delGlyphName(self):
         sel = self.w.dataList.getSelection()
         if sel:
-            index = sel[0]
-            del self.w.dataList[index]
+            items = self.w.dataList.get()
+            for i in reversed(sel):
+                del items[i]
+            self.w.dataList.set(items)
 
     def importGlyphNames(self):
         self.showGetFile(["ramsaySt"], self._importGlyphNames)
