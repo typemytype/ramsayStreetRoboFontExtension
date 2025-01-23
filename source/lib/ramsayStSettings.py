@@ -128,18 +128,34 @@ class RamsayStSettingsWindowController(BaseWindowController):
     def _importGlyphNames(self, path):
         if path:
             path = path[0]
-            f = open(path, "r")
-            lines = f.readlines()
-            f.close()
+            with open(path, "r") as blob:
+                lines = blob.read().splitlines()
 
             data = dict()
             for line in lines:
                 if line.startswith("#"):
                     continue
+
                 items = line.split()
-                if len(items) != 3:
+                glyphName = items[0]
+                if len(items) == 1:
+                    # no partners -- weird but OK
+                    leftGlyphName = rightGlyphName = ' '
+                elif len(items) == 2:
+                    # left or right glyph name is empty
+                    if line.endswith(' '):
+                        # right is empty
+                        leftGlyphName = items[-1]
+                        rightGlyphName = ' '
+                    else:
+                        # left is empty
+                        leftGlyphName = ' '
+                        rightGlyphName = items[-1]
+                elif len(items) == 3:
+                    # all are filled
+                    glyphName, leftGlyphName, rightGlyphName = items
+                else:
                     continue
-                glyphName, leftGlyphName, rightGlyphName = items
                 data[glyphName] = leftGlyphName, rightGlyphName
 
             RamsayStData.clear()
