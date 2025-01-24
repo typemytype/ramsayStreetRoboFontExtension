@@ -207,10 +207,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
         self.w.close()
 
     def dataListEditCallback(self, sender):
-        sel = sender.getSelection()
-        for i in sel:
-            item = sender[i]
-            RamsayStData.set(item)
+        return
 
     def update(self):
         postEvent(RamsayStData.changedEventName)
