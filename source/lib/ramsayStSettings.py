@@ -161,6 +161,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
 
         output = [
             "# Ramsay St. Glyph List",
+            "# Use _ as a placeholder for 'no glyph'"
             "# <glyphName> <leftGlyphName> <rightGlyphName>"
         ]
         for glyphName in sorted(RamsayStData.keys()):
