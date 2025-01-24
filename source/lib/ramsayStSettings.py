@@ -49,7 +49,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
 
         self.w.showNeighbours = vanilla.CheckBox((10, 10, -10, 22), "Show Neighbours", value=RamsayStData.showNeighbours, callback=self.showNeighboursCallback)
         self.w.showPreview = vanilla.CheckBox((10, 40, -10, 22), "Show In Preview Mode", value=RamsayStData.showPreview, callback=self.showPreviewCallback)
-        
+
         self.w.fillColorText = vanilla.TextBox((10, 70, 110, 22), "Fill Color:")
         self.w.fillColor = vanilla.ColorWell((10, 90, 110, 40), color=rgbaToNSColor(RamsayStData.fillColor), callback=self.fillColorCallback)
 
@@ -117,8 +117,10 @@ class RamsayStSettingsWindowController(BaseWindowController):
     def delGlyphName(self):
         sel = self.w.dataList.getSelection()
         if sel:
-            index = sel[0]
-            del self.w.dataList[index]
+            items = self.w.dataList.get()
+            for i in reversed(sel):
+                del items[i]
+            self.w.dataList.set(items)
 
     def importGlyphNames(self):
         self.showGetFile(["ramsaySt"], self._importGlyphNames)
@@ -126,19 +128,24 @@ class RamsayStSettingsWindowController(BaseWindowController):
     def _importGlyphNames(self, path):
         if path:
             path = path[0]
-            f = open(path, "r")
-            lines = f.readlines()
-            f.close()
+            with open(path, "r") as blob:
+                lines = blob.read().splitlines()
 
             data = dict()
             for line in lines:
                 if line.startswith("#"):
                     continue
+
                 items = line.split()
-                if len(items) != 3:
+                if len(items) == 3:
+                    glyphName, leftGlyphName, rightGlyphName = items
+                    if leftGlyphName == '_':
+                        leftGlyphName = ' '
+                    if rightGlyphName == '_':
+                        rightGlyphName = ' '
+                    data[glyphName] = leftGlyphName, rightGlyphName
+                else:
                     continue
-                glyphName, leftGlyphName, rightGlyphName = items
-                data[glyphName] = leftGlyphName, rightGlyphName
 
             RamsayStData.clear()
             RamsayStData.update(data)
@@ -154,16 +161,20 @@ class RamsayStSettingsWindowController(BaseWindowController):
 
         output = [
             "# Ramsay St. Glyph List",
+            "# Use _ as a placeholder for 'no glyph'"
             "# <glyphName> <leftGlyphName> <rightGlyphName>"
         ]
         for glyphName in sorted(RamsayStData.keys()):
-            value = RamsayStData.get(glyphName, None)
-            if value is not None:
-                output.append("%s %s %s" % (glyphName, value[0], value[1]))
+            left, right = RamsayStData.get(glyphName, (None, None))
+            if all([left, right]):
+                if left == ' ':
+                    left = '_'
+                if right == ' ':
+                    right = '_'
+                output.append(f"{glyphName} {left} {right}")
 
-        f = open(path, "w")
-        f.write("\n".join(output))
-        f.close()
+        with open(path, "w") as blob:
+            blob.write("\n".join(output))
 
     def addDelCallback(self, sender):
         v = sender.get()
@@ -189,10 +200,7 @@ class RamsayStSettingsWindowController(BaseWindowController):
         self.w.close()
 
     def dataListEditCallback(self, sender):
-        sel = sender.getSelection()
-        for i in sel:
-            item = sender[i]
-            RamsayStData.set(item)
+        return
 
     def update(self):
         postEvent(RamsayStData.changedEventName)
