@@ -55,13 +55,13 @@ class RamsaySts(Subscriber):
                 baseName = RamsayStData.getBaseGlyph(glyph.name)
                 leftGlyphName, rightGlyphName = RamsayStData.get(baseName, ("n", "n"))
 
-            if leftGlyphName in layer.keys():
+            if leftGlyphName and leftGlyphName in layer:
                 self.leftGlyph = layer[leftGlyphName]
                 leftPath = self.leftGlyph.getRepresentation("merz.CGPath")
                 self.leftGlyphContainer.setPosition((-self.leftGlyph.width, 0))
                 self.previewLeftGlyphContainer.setPosition((-self.leftGlyph.width, 0))
 
-            if rightGlyphName in layer.keys():
+            if rightGlyphName and rightGlyphName in layer:
                 self.rightGlyph = layer[rightGlyphName]
                 rightPath = self.rightGlyph.getRepresentation("merz.CGPath")
                 self.rightGlyphContainer.setPosition((glyph.width, 0))
