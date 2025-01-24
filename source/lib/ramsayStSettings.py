@@ -137,26 +137,15 @@ class RamsayStSettingsWindowController(BaseWindowController):
                     continue
 
                 items = line.split()
-                glyphName = items[0]
-                if len(items) == 1:
-                    # no partners -- weird but OK
-                    leftGlyphName = rightGlyphName = ' '
-                elif len(items) == 2:
-                    # left or right glyph name is empty
-                    if line.endswith(' '):
-                        # right is empty
-                        leftGlyphName = items[-1]
-                        rightGlyphName = ' '
-                    else:
-                        # left is empty
-                        leftGlyphName = ' '
-                        rightGlyphName = items[-1]
-                elif len(items) == 3:
-                    # all are filled
+                if len(items) == 3:
                     glyphName, leftGlyphName, rightGlyphName = items
+                    if leftGlyphName == '_':
+                        leftGlyphName = ' '
+                    if rightGlyphName == '_':
+                        rightGlyphName = ' '
+                    data[glyphName] = leftGlyphName, rightGlyphName
                 else:
                     continue
-                data[glyphName] = leftGlyphName, rightGlyphName
 
             RamsayStData.clear()
             RamsayStData.update(data)
@@ -175,13 +164,16 @@ class RamsayStSettingsWindowController(BaseWindowController):
             "# <glyphName> <leftGlyphName> <rightGlyphName>"
         ]
         for glyphName in sorted(RamsayStData.keys()):
-            value = RamsayStData.get(glyphName, None)
-            if value is not None:
-                output.append("%s %s %s" % (glyphName, value[0], value[1]))
+            left, right = RamsayStData.get(glyphName, (None, None))
+            if all([left, right]):
+                if left == ' ':
+                    left = '_'
+                if right == ' ':
+                    right = '_'
+                output.append(f"{glyphName} {left} {right}")
 
-        f = open(path, "w")
-        f.write("\n".join(output))
-        f.close()
+        with open(path, "w") as blob:
+            blob.write("\n".join(output))
 
     def addDelCallback(self, sender):
         v = sender.get()
