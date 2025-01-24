@@ -14,7 +14,7 @@ class RamsaySts(Subscriber):
             appearanceColorKey("glyphViewPreviewFillColor"))
         self.leftGlyph = self.rightGlyph = None
 
-        container = glyphEditor.extensionContainer(RamsayStData.identifier, location="foreground")
+        container = glyphEditor.extensionContainer(RamsayStData.identifier, location="middleground")
         self.leftGlyphContainer = container.appendPathSublayer(
             fillColor=RamsayStData.fillColor,
             strokeColor=RamsayStData.strokeColor,
