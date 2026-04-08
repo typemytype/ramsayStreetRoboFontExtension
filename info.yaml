@@ -3,7 +3,7 @@ developer: TypeMyType
 developerURL: http://www.typemytype.com
 launchAtStartUp: true
 mainScript: ramsaySt.py
-version: '2.8.1'
+version: '2.9'
 addToMenu:
 - path: ramsayStSettings.py
   preferredName: Settings...
