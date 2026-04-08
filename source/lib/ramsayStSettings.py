@@ -173,6 +173,7 @@ class RamsayStSettingsController(ezui.WindowController):
         RamsayStData.strokeColorDark = self.w.getItem("strokeColorDark").get()
         RamsayStData.showNeighbours = self.w.getItem("showNeighborsEditMode").get()
         RamsayStData.showPreview = self.w.getItem("showNeighborsPreviewMode").get()
+        RamsayStData.save()
         postEvent(RamsayStData.changedEventName)
 
     def saveTableData(self):
